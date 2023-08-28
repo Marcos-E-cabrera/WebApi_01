@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using WebApiYerbas.Models;
+using WebApiYerbas.Services;
 
 namespace WebApiYerbas
 {
@@ -13,7 +14,12 @@ namespace WebApiYerbas
             // Add services to the container.
 
             builder.Services.AddControllers();
-
+            builder.Services.AddScoped<IYerbaServices, YerbaServices>(); // injection services
+           
+            builder.Services.AddDbContext<YerbasApiRestContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("YerbasApiRestContext")); // injection base de datos
+            });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

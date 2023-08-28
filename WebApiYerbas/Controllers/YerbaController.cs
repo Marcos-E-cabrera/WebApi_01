@@ -10,39 +10,49 @@ namespace WebApiYerbas.Controllers
     [Route("api/[controller]/[action]")]
     public class YerbaController : Controller
     {
+        private readonly IYerbaServices _yerbaServices;
 
+        public YerbaController(IYerbaServices yerbaServices)
+        {
+            _yerbaServices = yerbaServices;
+        }
 
         [HttpGet]
-        public List<Yerba> Get()
+        public IActionResult Get()
         {
-            return YerbaServices.Get();
+            return Ok(_yerbaServices.Get());
         }
 
 
         [HttpGet("{id}")]
-        public Yerba GetById(int id)
+        public IActionResult GetById(int id)
         {
-            return YerbaServices.GetById(id);
+            var oYerba = _yerbaServices.GetById(id);
+            if (oYerba == null)
+                return NotFound();
+
+            return Ok(oYerba);
         }
 
 
-        [HttpPut]
-        public bool Put(Yerba yerba)
+        [HttpPut("{id}")]
+        public IActionResult Put(int id, Yerba yerba)
         {
-            return YerbaServices.Update(yerba);
+            return Ok(_yerbaServices.Update(id, yerba));
         }
+
 
         [HttpPost]
-        public bool Post(Yerba yerba)
+        public IActionResult Post(Yerba yerba)
         {
-            return YerbaServices.Add(yerba);
+            return Ok(_yerbaServices.Add(yerba));
         }
 
-  
+
         [HttpDelete("{id}")]
-        public bool Delete(int id)
+        public IActionResult Delete(int id)
         {
-            return YerbaServices.Delete(id);
+            return Ok(_yerbaServices.Delete(id));
         }
 
 

@@ -1,202 +1,127 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using Microsoft.IdentityModel.Tokens;
 using System.Reflection.PortableExecutable;
 using WebApiYerbas.Models;
 
 namespace WebApiYerbas.Services
 {
-    public class YerbaServices
+    public class YerbaServices : IYerbaServices
     {
-        private static string connectionString = "Server=.; Database=YerbasApiRest; Trusted_Connection=True; TrustServerCertificate=True;";
+        #region DATA BASE INJECTION
+        private readonly YerbasApiRestContext _context;
 
-
-        public static List<Yerba> Get()
+        public YerbaServices(YerbasApiRestContext context) 
         {
-            List<Yerba> lst = new List<Yerba>();
-            string query = "Select * from yerbas";
+            _context = context;
+        }
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+
+        #endregion
+
+        #region GET 
+        public IEnumerable<Yerba> Get() =>  _context.Yerbas.ToList();
+
+        #endregion
+
+        #region GET BY ID
+        public Yerba? GetById(int id) => _context.Yerbas.FirstOrDefault(x  => x.Id == id);
+        #endregion
+
+        #region ADD
+        public bool Add(Yerba oYerba)
+        {
+            bool result = false;
+
+            try
             {
-                try
+                var yerba = new Yerba()
                 {
-                    var command = new SqlCommand(query, connection);
-                    connection.Open();
-                    var reader = command.ExecuteReader();
+                    Nombre = oYerba.Nombre,
+                    Cantidad = oYerba.Cantidad
+                };
 
-                    while (reader.Read())
+                _context.Add(yerba);
+                _context.SaveChanges();
+
+                result = true;
+            }
+            catch (Exception) 
+            {
+                result = false;
+            }
+           
+            return result;
+        }
+        #endregion
+
+        #region UPDATE
+        public bool Update(int id, Yerba oYerba)
+        {
+            bool result = false;
+
+            try
+            {
+                var oAux = from x in _context.Yerbas
+                             where x.Id == id
+                             select x;
+
+                if ( oAux.IsNullOrEmpty() ) 
+                {
+                    throw new Exception();
+                }
+                else
+                {
+                    foreach (  var x in oAux)
                     {
-                        lst.Add(new Yerba()
-                        {
-                            Id = int.Parse(reader["Id"].ToString()),
-                            Nombre = reader["Nombre"].ToString(),
-                            Cantidad = int.Parse(reader["Cantidad"].ToString())
-                        });
+                        x.Nombre = oYerba.Nombre;
+                        x.Cantidad = oYerba.Cantidad;
                     }
 
-                    reader.Close();
-                }
-                catch (Exception ex)
-                {
-                    return lst;
-                }
-                finally
-                {
-                    connection.Close();
-                }
-            }
-            return lst;
-        }
-
-        public static Yerba GetById(int id)
-        {
-            Yerba oYerba = null;
-
-            string query = "SELECT * FROM yerbas" +
-                           " WHERE Id = @Id";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@Id", id); // Agregar parámetro Id
-                    
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-
-                    if (reader.Read())
-                    {
-                        oYerba = new Yerba()
-                        {
-                            Id = int.Parse(reader["Id"].ToString()),
-                            Nombre = reader["Nombre"].ToString(),
-                            Cantidad = int.Parse(reader["Cantidad"].ToString())
-                        };
-                    }
-
-                    reader.Close();
-                }
-                catch (Exception)
-                {
-                    return oYerba;
-                }
-                finally
-                {
-                    connection.Close();
-                }
-            }
-            return oYerba;
-        }
-
-
-        public static bool Add(Yerba oYerba)
-        {
-            bool result = false;
-
-            string query = "INSERT INTO yerbas (Nombre, Cantidad) " +
-                           "VALUES ( @Nombre, @Cantidad )";
-
-            using (var connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    var command = new SqlCommand(query, connection);
-
-                    command.Parameters.AddWithValue("@Nombre", oYerba.Nombre);
-                    command.Parameters.AddWithValue("@Cantidad", oYerba.Cantidad);
-
-                    connection.Open();
-
-                    command.ExecuteNonQuery(); 
+                    _context.SaveChanges();
 
                     result = true;
-
                 }
-                catch(Exception)
-                {
-                    return result;
-                }
-                finally
-                {
-                    connection.Close();
-                }
+            }
+            catch (Exception)
+            {
+                result = false;
             }
 
             return result;
         }
-
-        public static bool Update (Yerba oYerba)
+        #endregion
+        
+        #region DELETE
+        public bool Delete(int id)
         {
             bool result = false;
 
-            string query = "UPDATE yerbas SET Nombre=@Nombre, Cantidad=@Cantidad " +
-                                "WHERE id=@id";
-
-            using (var connection = new SqlConnection(connectionString))
+            try
             {
-                try
+                var oAux = _context.Yerbas.FirstOrDefault(x => x.Id == id);
+
+                if (oAux == null)
                 {
-                    var command = new SqlCommand(query, connection);
+                    throw new Exception();
+                }
+                else
+                {
+                    _context.Remove(oAux);
 
-                    command.Parameters.AddWithValue("@Id", oYerba.Id);
-                    command.Parameters.AddWithValue("@Nombre", oYerba.Nombre);
-                    command.Parameters.AddWithValue("@Cantidad", oYerba.Cantidad);
-
-                    connection.Open();
-
-                    command.ExecuteNonQuery();
+                    _context.SaveChanges();
 
                     result = true;
-
                 }
-                catch (Exception)
-                {
-                    return result;
-                }
-                finally
-                {
-                    connection.Close();
-                }
+            }
+            catch (Exception)
+            {
+                result = false;
             }
 
             return result;
         }
-
-
-
-        public static bool Delete(int id)
-        {
-            bool result = false;
-
-            string query = "DELETE FROM yerbas " +
-                           "WHERE id=@id";
-
-            using (var connection = new SqlConnection(connectionString))
-            {
-                var command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@id", id);
-
-                try
-                {
-                    connection.Open();
-                    command.ExecuteNonQuery();
-
-                    connection.Close();
-                    result = true;
-                }
-                catch (Exception)
-                {
-                    return result;
-                }
-                finally
-                {
-                    connection.Close();
-                }
-
-            }
-
-            return result;
-        }
+        #endregion
     }
 }
