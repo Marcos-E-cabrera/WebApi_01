@@ -4,7 +4,7 @@
 - Es una Api Rest que usa los protocolos HTTP para obtener, modificar, eliminar y actualizar distintos tipos de Yerba Mate.
 - Se implento:
     - Entity Framework.
-    - Inyeccion de independencia tanto para la conexion de base de datos y servicios.
+    - Inyección de dependencias tanto para la conexion de base de datos y servicios.
     
 
 ## Authors
