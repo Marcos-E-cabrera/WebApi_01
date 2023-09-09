@@ -18,41 +18,165 @@ namespace WebApiYerbas.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            return Ok(_yerbaServices.Get());
+            try
+            {
+                var oYerba = await _yerbaServices.GetAsync();
+                if (oYerba == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(oYerba);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message,
+                    result = ""
+                });
+            }
         }
 
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var oYerba = _yerbaServices.GetById(id);
-            if (oYerba == null)
-                return NotFound();
+            try
+            {
+                var oYerba = await _yerbaServices.GetByIdAsync(id);
+                if (oYerba == null)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "ID No existente",
+                        result = ""
+                    });
+                }
 
-            return Ok(oYerba);
+                return Ok(oYerba);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message,
+                    result = ""
+                });
+            }
         }
 
 
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, Yerba yerba)
+        [HttpPut]
+        public async Task<IActionResult> Put(Yerba yerba)
         {
-            return Ok(_yerbaServices.Update(id, yerba));
+            try
+            {
+                var isValido = await _yerbaServices.UpdateAsync(yerba);
+                if (isValido == false)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "Yerba no encontrada o No existente",
+                        result = ""
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Yerba actualizada con Exito",
+                    result = ""
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message,
+                    result = ""
+                });
+            }
         }
 
 
         [HttpPost]
-        public IActionResult Post(Yerba yerba)
+        public async Task<IActionResult> Post(Yerba yerba)
         {
-            return Ok(_yerbaServices.Add(yerba));
+            try
+            {
+                var data = await _yerbaServices.AddAsync(yerba);
+
+                if (data == 0)
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "Yerba Creada con Éxito",
+                        result = ""
+                    });
+                }
+                else
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = _yerbaServices.GetErrorMessage(data),
+                        result = ""
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message,
+                    result = ""
+                });
+            }
         }
 
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            return Ok(_yerbaServices.Delete(id));
+            try
+            {
+                var isValido = await _yerbaServices.DeleteAsync(id);
+                if (isValido == false)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "Yerba no encontrada o No existente",
+                        result = ""
+                    });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Yerba Eliminada con Exito",
+                    result = ""
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message,
+                    result = ""
+                });
+            }
         }
 
 

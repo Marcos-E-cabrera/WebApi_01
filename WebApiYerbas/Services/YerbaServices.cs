@@ -9,7 +9,6 @@ namespace WebApiYerbas.Services
 {
     public class YerbaServices : IYerbaServices
     {
-        #region DATA BASE INJECTION
         private readonly YerbasApiRestContext _context;
 
         public YerbaServices(YerbasApiRestContext context) 
@@ -17,24 +16,33 @@ namespace WebApiYerbas.Services
             _context = context;
         }
 
+        public async Task<IEnumerable<Yerba>> GetAsync() => await _context.Yerbas.ToListAsync();
 
-        #endregion
+        public async Task<Yerba?> GetByIdAsync(int id) => await  _context.Yerbas.FirstOrDefaultAsync(x  => x.Id == id);
 
-        #region GET 
-        public IEnumerable<Yerba> Get() =>  _context.Yerbas.ToList();
-
-        #endregion
-
-        #region GET BY ID
-        public Yerba? GetById(int id) => _context.Yerbas.FirstOrDefault(x  => x.Id == id);
-        #endregion
-
-        #region ADD
-        public bool Add(Yerba oYerba)
+        public async Task<bool> UpdateAsync(Yerba oYerba)
         {
             bool result = false;
 
-            try
+            var dataYerba = await _context.Yerbas.FirstOrDefaultAsync(x => x.Id == oYerba.Id);
+
+            if (dataYerba != null)
+            {
+                dataYerba.Nombre = oYerba.Nombre;
+                dataYerba.Cantidad = oYerba.Cantidad;
+
+                _context.SaveChanges();
+
+                result = true;
+            }   
+            return result;
+        }
+
+        public async Task<int> AddAsync(Yerba oYerba)
+        {
+            int result = ValidarYerba(oYerba);
+             
+            if (result == 0)
             {
                 var yerba = new Yerba()
                 {
@@ -44,84 +52,73 @@ namespace WebApiYerbas.Services
 
                 _context.Add(yerba);
                 _context.SaveChanges();
+            }
 
+            return result;
+           }
+
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            bool result = false;
+
+            var oAux = await _context.Yerbas.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (oAux != null)
+            {
+                _context.Remove(oAux);
+                _context.SaveChanges();
                 result = true;
             }
-            catch (Exception) 
-            {
-                result = false;
-            }
-           
+
             return result;
         }
-        #endregion
 
-        #region UPDATE
-        public bool Update(int id, Yerba oYerba)
+
+        /// <summary>
+        /// Valida si la yerba es valida para ser agregada
+        /// </summary>
+        /// <param name="oYerba"> yerba a agregar </param>
+        /// <returns> 
+        /// 0: OK, ERROR ( 1: Es NULL o Id ya usado, 2: Nombre vacio, 3: Cantidad menor a 0 ).
+        /// </returns>
+        private int ValidarYerba(Yerba oYerba)
         {
-            bool result = false;
+            int result = 0;
 
-            try
+            var data = _context.Yerbas.FirstOrDefault(x => x.Id ==  oYerba.Id);
+            if (oYerba == null || data != null)
             {
-                var oAux = from x in _context.Yerbas
-                             where x.Id == id
-                             select x;
-
-                if ( oAux.IsNullOrEmpty() ) 
-                {
-                    throw new Exception();
-                }
-                else
-                {
-                    foreach (  var x in oAux)
-                    {
-                        x.Nombre = oYerba.Nombre;
-                        x.Cantidad = oYerba.Cantidad;
-                    }
-
-                    _context.SaveChanges();
-
-                    result = true;
-                }
+                result = 1;
             }
-            catch (Exception)
+            else if (oYerba.Nombre.IsNullOrEmpty())
             {
-                result = false;
+                result = 2;
             }
-
+            else if (oYerba.Cantidad <= 0)
+            {
+                result = 3;
+            }
             return result;
         }
-        #endregion
-        
-        #region DELETE
-        public bool Delete(int id)
+
+        public string GetErrorMessage(int errorCode)
         {
-            bool result = false;
-
-            try
+            switch (errorCode)
             {
-                var oAux = _context.Yerbas.FirstOrDefault(x => x.Id == id);
+                case 1:
+                    return "Parametros no ingresados O ID ya usado";
 
-                if (oAux == null)
-                {
-                    throw new Exception();
-                }
-                else
-                {
-                    _context.Remove(oAux);
+                case 2:
+                    return "Nombre no ingresado";
 
-                    _context.SaveChanges();
+                case 3:
+                    return "Cantidad inválida";
 
-                    result = true;
-                }
+                default:
+                    return "Error desconocido";
             }
-            catch (Exception)
-            {
-                result = false;
-            }
-
-            return result;
         }
-        #endregion
+
     }
 }
