@@ -20,25 +20,29 @@ namespace WebApiYerbas.Services
 
         public async Task<Yerba?> GetByIdAsync(int id) => await  _context.Yerbas.FirstOrDefaultAsync(x  => x.Id == id);
 
-        public async Task<bool> UpdateAsync(Yerba oYerba)
+        public async Task<int> UpdateAsync(Yerba oYerba)
         {
-            bool result = false;
+            int result = 4;
 
             var dataYerba = await _context.Yerbas.FirstOrDefaultAsync(x => x.Id == oYerba.Id);
 
             if (dataYerba != null)
             {
-                dataYerba.Nombre = oYerba.Nombre;
-                dataYerba.Cantidad = oYerba.Cantidad;
+                result = ValidarActualizacion(oYerba);
 
-                _context.SaveChanges();
+                if (result == 0)
+                {
+                    dataYerba.Nombre = oYerba.Nombre;
+                    dataYerba.Cantidad = oYerba.Cantidad;
 
-                result = true;
+                    _context.SaveChanges();
+                }
             }   
+
             return result;
         }
 
-        public async Task<int> AddAsync(Yerba oYerba)
+        public int Add(Yerba oYerba)
         {
             int result = ValidarYerba(oYerba);
              
@@ -57,30 +61,50 @@ namespace WebApiYerbas.Services
             return result;
            }
 
-
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<int> DeleteAsync(int id)
         {
-            bool result = false;
+            int result = 4;
+            
+            var dataYerba = await _context.Yerbas.FirstOrDefaultAsync(x => x.Id == id);
 
-            var oAux = await _context.Yerbas.FirstOrDefaultAsync(x => x.Id == id);
-
-            if (oAux != null)
+            if (dataYerba != null)
             {
-                _context.Remove(oAux);
+                _context.Remove(dataYerba);
                 _context.SaveChanges();
-                result = true;
+                result = 0;
             }
 
             return result;
         }
 
+        /// <summary>
+        /// Valida si los datos a actulizar esten bien
+        /// </summary>
+        /// <param name="oYerba"> yerba con ls datos a actualizar</param>
+        /// <returns>
+        /// 0: OK, ERROR ( 1: Nombre vacio, 2: Cantidad menor a 0).
+        /// </returns>
+        private int ValidarActualizacion(Yerba oYerba)
+        {
+            int result = 0;
+
+            if (oYerba.Nombre.IsNullOrEmpty())
+            {
+                result = 2;
+            }
+            else if (oYerba.Cantidad <= 0)
+            {
+                result = 3;
+            }
+            return result;
+        }
 
         /// <summary>
         /// Valida si la yerba es valida para ser agregada
         /// </summary>
         /// <param name="oYerba"> yerba a agregar </param>
         /// <returns> 
-        /// 0: OK, ERROR ( 1: Es NULL o Id ya usado, 2: Nombre vacio, 3: Cantidad menor a 0 ).
+        /// 0: OK, ERROR ( 1: Es NULL o Id ya usado, 2: Nombre vacio, 3: Cantidad menor a 0, 4: Yerba no encontrada o No existente).
         /// </returns>
         private int ValidarYerba(Yerba oYerba)
         {
@@ -114,6 +138,9 @@ namespace WebApiYerbas.Services
 
                 case 3:
                     return "Cantidad inválida";
+
+                case 4:
+                    return "Yerba no encontrada o No existente";
 
                 default:
                     return "Error desconocido";

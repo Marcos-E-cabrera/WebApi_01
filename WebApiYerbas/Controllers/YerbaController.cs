@@ -77,23 +77,25 @@ namespace WebApiYerbas.Controllers
         {
             try
             {
-                var isValido = await _yerbaServices.UpdateAsync(yerba);
-                if (isValido == false)
+                var data = await _yerbaServices.UpdateAsync(yerba);
+                if (data == 0)
                 {
-                    return NotFound(new
+                    return Ok(new
                     {
-                        success = false,
-                        message = "Yerba no encontrada o No existente",
+                        success = true,
+                        message = "Yerba actualizada con Éxito",
                         result = ""
                     });
                 }
-
-                return Ok(new
+                else
                 {
-                    success = true,
-                    message = "Yerba actualizada con Exito",
-                    result = ""
-                });
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = _yerbaServices.GetErrorMessage(data),
+                        result = ""
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -108,11 +110,11 @@ namespace WebApiYerbas.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Post(Yerba yerba)
+        public IActionResult Post(Yerba yerba)
         {
             try
             {
-                var data = await _yerbaServices.AddAsync(yerba);
+                var data = _yerbaServices.Add(yerba);
 
                 if (data == 0)
                 {
@@ -150,23 +152,25 @@ namespace WebApiYerbas.Controllers
         {
             try
             {
-                var isValido = await _yerbaServices.DeleteAsync(id);
-                if (isValido == false)
+                var data = await _yerbaServices.DeleteAsync(id);
+                if (data == 0)
                 {
-                    return NotFound(new
+                    return Ok(new
                     {
-                        success = false,
-                        message = "Yerba no encontrada o No existente",
+                        success = true,
+                        message = "Yerba Eliminada con Éxito",
                         result = ""
                     });
                 }
-
-                return Ok(new
+                else
                 {
-                    success = true,
-                    message = "Yerba Eliminada con Exito",
-                    result = ""
-                });
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = _yerbaServices.GetErrorMessage(data),
+                        result = ""
+                    });
+                }
             }
             catch (Exception ex)
             {

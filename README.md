@@ -4,7 +4,8 @@
 - Es una Api Rest que usa los protocolos HTTP para obtener, modificar, eliminar y actualizar distintos tipos de Yerba Mate.
 - Se implento:
     - Entity Framework.
-    - Inyección de dependencias tanto para la conexion de base de datos y servicios.
+    - Inyeccion de Dependencia tanto para la conexion de base de datos y servicios.
+    
     
 
 ## Authors
@@ -14,120 +15,122 @@
 
 ## API Reference
 
-### Get all elements
+### Obtener todos los elementos
 
+#### Descripción:
+Este endpoint se utiliza para obtener una lista de todos los elementos de Yerba Mate.
+
+#### URL del Endpoint:
 ```http
   GET /api/Yerba/Get
-
-  Request body:
-  {
-    "id": 1,
-    "nombre": "Playadito",
-    "cantidad": 10
-  }
 ```
+#### Parámetros:
 
-| Parameter | Type     | Description                |
+| Parametros | Tipo     | Descripción                |
 | :-------- | :------- | :------------------------- |
 | - | `string` | - |
 
-#### Description:
 
-Este endpoint se utiliza para obtener todos los elementos de Yerba Mate.
+#### Respuesta:
+- 200 OK: La solicitud se completó con éxito. Se devuelve una lista de elementos de Yerba Mate.
+- 404 Not Found: No se encontraron elementos de Yerba Mate.
 
-#### Response:
+---
 
-- 200 OK: Se devuelve cuando la solicitud se completa con éxito y se incluyen los datos solicitados.
-- 404 Not Found: Se devuelve cuando no se encuentran datos correspondientes a la solicitud.
+### Obtener elemento por ID
 
+#### Descripción:
+Este endpoint se utiliza para obtener un elemento de Yerba Mate específico por su ID.
 
-### Get Yerba
+#### URL del Endpoint:
 
 ```http
   GET /api/Yerba/GetById/{id}
 ```
 
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `id`      | `int` | **Required**. Id of item to fetch |
+#### Parámetros:
+| Parametros | Tipo     | Descripción                |
+| :-------- | :------- | :------------------------- |
+| `id`      | `int` | **Requiere** ID del item a buscar|
 
-#### Description:
-
-Este endpoint se utiliza para obtener un elemento de Yerba Mate específico por su ID.
-
-#### Response:
-
+#### Respuesta:
 - 200 OK: Se devuelve cuando se encuentra y se incluye el elemento solicitado.
 - 404 Not Found: Se devuelve cuando el elemento no se encuentra.
+---
+### Actualizar elemento
 
-### Update Yerba
-
-```http
-  PUT /api/Yerba/Put/{id}
-
-  Request body:
-  {
-    "nombre": "",
-    "cantidad": 0
-  }
-```
-
-| Parameter | Type   | Description               |
-| :-------- | :----- | :------------------------ |
-| `Id`   | `int` | **Required**. Id of item to update |
-| `Yerba`   | `json` | **Required**. Yerba data |
-
-#### Description:
-
+#### Descripción:
 Este endpoint se utiliza para actualizar un elemento de Yerba Mate existente por su ID.
 
-#### Response:
+#### URL del Endpoint:
+```http
+  PUT /api/Yerba/Put/{id}
+```
+#### Parámetros:
+| Parameter | Type   | Description               |
+| :-------- | :----- | :------------------------ |
+| `Id`   | `int` | **Requiere** ID el item a actualizar |
+| `Yerba`   | `json` | **Requiere** Yerba data |
 
+#### Respuesta:
 - 200 OK: Se devuelve cuando la actualización se completa con éxito.
-- 200 (false): Se devuelve cuando el elemento a actualizar no se encuentra.
+- 400 BadRequest: Muestra cual fue el error.
 
-### Add Yerba
+#### Ejemplo de Cuerpo de Solicitud (Request Body)
+```Json
+  {
+    "id": "1"
+    "nombre": "xxxxx",
+    "cantidad": 10
+  }
+```
+---
+### Agregar elemento
+
+#### Descripción:
+Este endpoint se utiliza para agregar un nuevo elemento de Yerba Mate.
+
+#### URL del Endpoint:
 
 ```http
   POST /api/Yerba/Post
+```
+#### Parámetros:
 
-  Request body:
+| Parametros | Tipo     | Descripción                |
+| :-------- | :------- | :------------------------- |
+| `Yerba`   | `json` | **Required**. Yerba data |
+
+#### Response:
+- 200 OK: Se devuelve cuando la adición se completa con éxito.
+- 400 BadRequest: Muestra cual fue el error.
+
+#### Ejemplo de Cuerpo de Solicitud (Request Body)
+```Json
   {
-    "nombre": "",
-    "cantidad": 0
+    "nombre": "xxxxx",
+    "cantidad": 12
   }
 ```
 
-| Parameter | Type   | Description               |
-| :-------- | :----- | :------------------------ |
-| `Yerba`   | `json` | **Required**. Yerba data |
-
-#### Description:
-
-Este endpoint se utiliza para agregar un nuevo elemento de Yerba Mate.
-
-#### Response:
-
-- 200 OK:  Se devuelve cuando la adición se completa con éxito.
-
+---
 ### Delete Yerba
 
+#### Descripción:
+Este endpoint se utiliza para eliminar un elemento de Yerba Mate existente por su ID.
+
+#### URL del Endpoint:
 ```http
   DELETE /api/Yerba/Delete/{id}
 ```
-
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `id`      | `int` | **Required**. Id of item to fetch |
-
-#### Description:
-
-Este endpoint se utiliza para eliminar un elemento de Yerba Mate existente por su ID.
-
+#### Parámetros:
+| Parametros | Tipo     | Descripción                |
+| :-------- | :------- | :------------------------- |
+| `id`      | `int` | **Requiere** ID del item a buscar|
 
 #### Response:
 
 - 200 OK: Se devuelve cuando la eliminación se completa con éxito.
-- 200 (false): Se devuelve cuando el elemento a eliminar no se encuentra.
+- 400 BadRequest: Muestra cual fue el error.
 
 

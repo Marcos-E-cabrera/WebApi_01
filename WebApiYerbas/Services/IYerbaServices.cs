@@ -23,13 +23,13 @@ namespace WebApiYerbas.Services
         Task<Yerba?> GetByIdAsync(int id);
 
         /// <summary>
-        /// Agrega de manera asincrónica una nueva yerba.
+        /// Agrega una nueva yerba.
         /// </summary>
         /// <param name="oYerba">La yerba que se desea agregar.</param>
         /// <returns>
         /// La tarea devuelve true si la operación se realiza con éxito, de lo contrario, devuelve false.
         /// </returns>
-        Task<int> AddAsync(Yerba oYerba);
+        public int Add(Yerba oYerba);
 
         /// <summary>
         /// Actualiza de manera asincrónica una yerba existente por su ID.
@@ -39,7 +39,7 @@ namespace WebApiYerbas.Services
         /// <returns>
         /// La tarea devuelve true si la actualización se realiza con éxito, de lo contrario, devuelve false.
         /// </returns>
-        Task<bool> UpdateAsync(Yerba oYerba);
+        Task<int> UpdateAsync(Yerba oYerba);
 
         /// <summary>
         /// Elimina de manera asincrónica una yerba por su ID.
@@ -48,8 +48,14 @@ namespace WebApiYerbas.Services
         /// <returns>
         /// La tarea devuelve true si la eliminación se realiza con éxito, de lo contrario, devuelve false.
         /// </returns>
-        Task<bool> DeleteAsync(int id);
+        Task<int> DeleteAsync(int id);
 
+        /// <summary>
+        /// Muestra un mensaje de error dependiendo del numero pasado por parametro
+        /// </summary>
+        /// <returns>
+        /// 0: OK, ERROR ( 1: Es NULL o Id ya usado, 2: Nombre vacio, 3: Cantidad menor a 0, 4: Yerba no encontrada o No existente).
+        /// </returns>
         public string GetErrorMessage(int errorCode);
 
     }
