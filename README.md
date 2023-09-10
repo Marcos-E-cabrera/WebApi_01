@@ -99,7 +99,7 @@ Este endpoint se utiliza para agregar un nuevo elemento de Yerba Mate.
 
 | Parametros | Tipo     | Descripción                |
 | :-------- | :------- | :------------------------- |
-| `Yerba`   | `json` | **Required**. Yerba data |
+| `Yerba`   | `json` | **Requiere** Yerba data |
 
 #### Response:
 - 200 OK: Se devuelve cuando la adición se completa con éxito.
