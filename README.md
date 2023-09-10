@@ -64,7 +64,7 @@ Este endpoint se utiliza para actualizar un elemento de Yerba Mate existente por
 
 #### URL del Endpoint:
 ```http
-  PUT /api/Yerba/Put/{id}
+  PUT /api/Yerba/Put
 ```
 #### Parámetros:
 | Parameter | Type   | Description               |
