@@ -2,11 +2,6 @@
 # Web Api Rest 
 
 - Es una Api Rest que usa los protocolos HTTP para obtener, modificar, eliminar y actualizar distintos tipos de Yerba Mate.
-- Se implento:
-    - Entity Framework.
-    - Inyeccion de Dependencia tanto para la conexion de base de datos y servicios.
-    
-    
 
 ## Authors
 
